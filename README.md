@@ -58,6 +58,33 @@ do zero, sem nenhum dado fictício.
   `getComputedStyle` das variáveis CSS, então se adaptam automaticamente.
 - **Trial de 14 dias + cobrança manual (Fase 1)** — só em `index.html`, o
   `demo.html` nunca mostra nada disso. Veja a seção própria abaixo.
+- **Diagnóstico financeiro** (aba 🩺 nova, em `index.html` e `demo.html`):
+  análise automática dos dados do mês — nota de 0 a 100 (margem do mês +
+  reserva de emergência + pontualidade nos pagamentos) e uma lista de
+  observações (positivas, de atenção, críticas ou dicas). É um motor de
+  regras/heurísticas em `renderDiagnostico()`, **não é IA generativa** — não
+  chama nenhuma API externa, roda 100% no navegador e não tem custo. Veja a
+  seção própria abaixo.
+
+## Diagnóstico financeiro (análise automática, não é IA generativa)
+
+`renderDiagnostico()` (chamada de `renderDash()` e ao clicar na aba
+Diagnóstico) calcula uma nota de 0-100 a partir de três fatores com pesos
+fixos:
+
+- **Margem do mês** (peso 40): `(receita - despesas) / receita`.
+- **Reserva de emergência** (peso 35): saldo da reserva comparado a 6× as
+  despesas do mês (referência clássica de reserva de emergência).
+- **Pontualidade** (peso 25): contas com dia de vencimento já passado e
+  ainda não marcadas como pagas.
+
+A partir desses números, gera de 3 a 6 cartões de texto (positivo/atenção/
+crítico/dica) com valores reais do usuário plugados em templates de frase —
+zero chamada de IA, zero custo por geração, funciona até offline no
+`demo.html`. Se algum dia migrar para um relatório gerado por LLM de
+verdade (Fase 2, ainda não iniciada), vai precisar de uma Cloud Function
+para não expor a chave de API no cliente — mesmo motivo por trás da
+cobrança manual ter ficado pra Fase 1 e o gateway pra Fase 2.
 
 ## Trial + cobrança manual (Fase 1)
 

@@ -423,6 +423,7 @@ input,select,button{font-family:var(--fn);}
       <button class="tab" data-sec="contas">Contas</button>
       <button class="tab" data-sec="reserva">Reserva</button>
       <button class="tab" id="tab-veiculo" data-sec="veiculo">🚗 Veículo</button>
+      <button class="tab" data-sec="diagnostico">🩺 Diagnóstico</button>
       <button class="tab" data-sec="config">Configurar</button>
     </div>
 
@@ -657,6 +658,15 @@ input,select,button{font-family:var(--fn);}
         <div class="card" style="margin-bottom:16px"><div class="ch"><div class="ct">📊 Gasto por abastecimento</div></div><div class="cw h200"><canvas id="fuelChart"></canvas></div></div>
         <div class="card"><div class="ch"><div class="ct">📈 Consumo (km/L) ao longo do tempo</div></div><div class="cw h200"><canvas id="consumoChart"></canvas></div></div>
       </div>
+    </div>
+
+    <!-- DIAGNÓSTICO -->
+    <div id="sec-diagnostico" class="sec">
+      <div class="card" style="margin-bottom:16px">
+        <div class="ch"><div class="ct">🩺 Diagnóstico financeiro</div></div>
+        <div style="font-size:12px;color:var(--mut)">Uma análise automática da sua saúde financeira neste mês, com base nos seus próprios dados. Não substitui orientação de um contador ou planejador financeiro.</div>
+      </div>
+      <div id="diag-content"></div>
     </div>
 
     <div id="sec-config" class="sec">
@@ -1577,15 +1587,139 @@ function renderDash(){
     else{sl='Boa';sc='#22c97a';}
     document.getElementById('saude').innerHTML=
       '<div style="font-size:13px;color:var(--mut);margin-bottom:10px">Sobra <strong style="color:'+sc+'">'+Math.round(saude*100)+'%</strong> da nota após as despesas. Acima de 50% = saúde boa.</div>'+
-      '<div style="display:flex;align-items:center;gap:10px"><div class="sbg"><div class="sf" style="width:'+Math.min(100,Math.round(Math.max(0,saude)*100))+'%;background:'+sc+'"></div></div><span style="font-size:12px;font-weight:500;color:'+sc+';min-width:70px;text-align:right">'+sl+'</span></div>';
+      '<div style="display:flex;align-items:center;gap:10px"><div class="sbg"><div class="sf" style="width:'+Math.min(100,Math.round(Math.max(0,saude)*100))+'%;background:'+sc+'"></div></div><span style="font-size:12px;font-weight:500;color:'+sc+';min-width:70px;text-align:right">'+sl+'</span></div>'+
+      '<div style="margin-top:12px"><a onclick="irParaDiagnostico()" style="font-size:12px;color:var(--blu);cursor:pointer">🩺 Ver diagnóstico completo →</a></div>';
   }
 
   renderDashCombustivel();
   renderCharts();
+  renderDiagnostico();
 }
 
 function met(cls,lb,val,sub){
   return'<div class="met '+cls+'"><div class="mlb">'+lb+'</div><div class="mval '+cls+'">'+val+'</div><div class="msub">'+sub+'</div></div>';
+}
+
+// ── DIAGNÓSTICO FINANCEIRO (análise automática, sem IA generativa) ──
+function renderDiagnostico(){
+  const el=document.getElementById('diag-content');
+  if(!el)return;
+  const cfg=S.config||DConfig;
+
+  if(cfg.nota<=0){
+    el.innerHTML='<div class="card"><div style="font-size:13px;color:var(--mut)">Configure sua receita mensal em <strong style="color:var(--txt)">Configurar</strong> e cadastre algumas contas pra gerar seu diagnóstico deste mês.</div></div>';
+    return;
+  }
+
+  const todos=allContas();
+  const total=todos.reduce(function(s,x){return s+Number(x.valor||0);},0);
+  const saldo=cfg.nota-total;
+  const saldoPct=cfg.nota>0?saldo/cfg.nota:0;
+
+  const r=S.reserva||DRes;
+  const reservaSaldo=Number(r.saldo||0);
+  const dm=Object.values(grupos()).reduce(function(s,v){return s+v;},0);
+  const reservaIdeal=dm*6;
+  const reservaPct=reservaIdeal>0?Math.min(1,reservaSaldo/reservaIdeal):(reservaSaldo>0?1:0);
+  const reservaMeses=dm>0?(reservaSaldo/dm):0;
+
+  const hoje=new Date();
+  const ehMesAtual=hoje.getMonth()===CM&&hoje.getFullYear()===CY;
+  const diaAtual=ehMesAtual?hoje.getDate():32;
+  const atrasadas=todos.filter(function(x){
+    if(GST(x.id)==='pg')return false;
+    const venc=Number(x.venc)||0;
+    return venc>0&&venc<diaAtual;
+  });
+
+  const totCartao=(getMesContas().cartoes||[]).reduce(function(s,x){return s+Number(x.valor||0);},0);
+  const pctCartao=total>0?totCartao/total:0;
+
+  // pontuação (0-100): margem do mês (40) + reserva de emergência (35) + pontualidade (25)
+  let scoreSaldo;
+  if(saldoPct<0)scoreSaldo=0;
+  else if(saldoPct<0.15)scoreSaldo=18;
+  else if(saldoPct<0.3)scoreSaldo=30;
+  else scoreSaldo=40;
+
+  let scoreReserva;
+  if(reservaPct>=1)scoreReserva=35;
+  else if(reservaPct>=0.5)scoreReserva=25;
+  else if(reservaPct>=0.2)scoreReserva=14;
+  else scoreReserva=Math.round(reservaPct*35);
+
+  let scoreAtraso;
+  if(atrasadas.length===0)scoreAtraso=25;
+  else if(atrasadas.length<=2)scoreAtraso=12;
+  else scoreAtraso=0;
+
+  const score=Math.round(scoreSaldo+scoreReserva+scoreAtraso);
+  let scoreLabel,scoreCor;
+  if(score>=80){scoreLabel='Excelente';scoreCor='#22c97a';}
+  else if(score>=60){scoreLabel='Boa';scoreCor='#4f8ef7';}
+  else if(score>=40){scoreLabel='Atenção';scoreCor='#f5a623';}
+  else{scoreLabel='Crítica';scoreCor='#f05252';}
+
+  const insights=[];
+
+  if(saldo<0){
+    insights.push({tipo:'critico',icone:'🚨',texto:'Suas despesas deste mês ('+R(total)+') já superam sua receita ('+R(cfg.nota)+') em '+R(Math.abs(saldo))+'. Revise as categorias com maior gasto antes que isso vire dívida.'});
+  }else if(saldoPct<0.15){
+    insights.push({tipo:'atencao',icone:'⚠️',texto:'Sua margem está apertada: sobra '+R(saldo)+' ('+Math.round(saldoPct*100)+'%) depois das despesas. Um imprevisto pode desequilibrar o mês.'});
+  }else{
+    insights.push({tipo:'positivo',icone:'✅',texto:'Sua margem está saudável: sobra '+R(saldo)+' ('+Math.round(saldoPct*100)+'%) da receita depois de todas as despesas.'});
+  }
+
+  if(reservaSaldo<=0){
+    insights.push({tipo:'atencao',icone:'⚠️',texto:'Você ainda não tem reserva de emergência. O ideal é guardar até 6× suas despesas mensais ('+R(reservaIdeal)+') — comece com qualquer valor este mês.'});
+  }else if(reservaPct<0.5){
+    insights.push({tipo:'atencao',icone:'⚠️',texto:'Sua reserva cobre '+reservaMeses.toFixed(1)+' mês(es) de despesas (ideal: 6). Considere guardar parte da sobra deste mês.'});
+  }else if(reservaPct<1){
+    insights.push({tipo:'dica',icone:'💡',texto:'Você já tem '+reservaMeses.toFixed(1)+' meses de despesas guardados — no caminho certo rumo aos 6 meses recomendados.'});
+  }else{
+    insights.push({tipo:'positivo',icone:'✅',texto:'Sua reserva de emergência está robusta: cobre mais de 6 meses de despesas.'});
+  }
+
+  if(atrasadas.length===0){
+    insights.push({tipo:'positivo',icone:'✅',texto:'Nenhuma conta vencida e pendente este mês — parabéns pela pontualidade.'});
+  }else{
+    const nomes=atrasadas.slice(0,3).map(function(x){return x.nome;}).join(', ');
+    insights.push({tipo:atrasadas.length>=3?'critico':'atencao',icone:atrasadas.length>=3?'🚨':'⚠️',texto:atrasadas.length+' conta(s) vencida(s) e ainda pendente(s)'+(nomes?': '+nomes:'')+'. Regularizar evita juros e protege seu nome.'});
+  }
+
+  if(total>0&&pctCartao>0.5){
+    insights.push({tipo:'dica',icone:'💡',texto:'Mais da metade das suas despesas ('+Math.round(pctCartao*100)+'%) está no cartão. Fique de olho pra não acumular uma fatura maior do que consegue pagar à vista.'});
+  }
+
+  if(cfg.temVeiculo!==false){
+    const fuel=(S.veiculo&&S.veiculo.combustivel)||[];
+    const doMes=fuel.filter(function(f){
+      if(!f.data)return false;
+      const d=new Date(f.data+'T00:00:00');
+      return!isNaN(d)&&d.getMonth()===CM&&d.getFullYear()===CY;
+    });
+    if(doMes.length){
+      const gasto=doMes.reduce(function(s,f){return s+(Number(f.litros)||0)*(Number(f.preco)||0);},0);
+      insights.push({tipo:'dica',icone:'💡',texto:'Você gastou '+R(gasto)+' com combustível este mês, em '+doMes.length+' abastecimento(s). Acompanhe na aba Veículo se o consumo está estável.'});
+    }
+  }
+
+  const barPct=Math.max(0,Math.min(100,score));
+  const coresTipo={positivo:'#22c97a',atencao:'#f5a623',critico:'#f05252',dica:'#4f8ef7'};
+  el.innerHTML=
+    '<div class="rcard" style="margin-bottom:16px">'
+      +'<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap">'
+        +'<div><div style="font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Sua nota geral</div><div style="font-size:32px;font-weight:600;font-family:var(--mo);color:'+scoreCor+'">'+score+'<span style="font-size:16px;color:var(--mut)">/100</span></div></div>'
+        +'<span class="rbadge" style="border:1px solid '+scoreCor+';color:'+scoreCor+'">'+scoreLabel+'</span>'
+      +'</div>'
+      +'<div class="sbg" style="height:10px"><div class="sf" style="width:'+barPct+'%;background:'+scoreCor+'"></div></div>'
+      +'<div style="font-size:11px;color:var(--mut);margin-top:8px">Baseado em 3 fatores: margem do mês, reserva de emergência e pontualidade nos pagamentos.</div>'
+    +'</div>'
+    +'<div style="display:flex;flex-direction:column;gap:10px">'
+    +insights.map(function(i){
+      return'<div class="card" style="margin-bottom:0;border-left:3px solid '+coresTipo[i.tipo]+'"><div style="display:flex;gap:10px;align-items:flex-start"><span style="font-size:16px">'+i.icone+'</span><span style="font-size:13px;line-height:1.55">'+i.texto+'</span></div></div>';
+    }).join('')
+    +'</div>';
 }
 
 // ── COMBUSTÍVEL DO MÊS (indicador no dashboard) ──────────────────
@@ -2464,8 +2598,13 @@ document.querySelectorAll('.tab').forEach(function(t){
     if(t.dataset.sec==='reserva')renderRes();
     if(t.dataset.sec==='config')renderCfg();
     if(t.dataset.sec==='veiculo'){fillVehicleForm();renderMaint();renderFuel();fillSeguroForm();renderSinistros();}
+    if(t.dataset.sec==='diagnostico')renderDiagnostico();
   });
 });
+window.irParaDiagnostico=function(){
+  const t=document.querySelector('.tab[data-sec="diagnostico"]');
+  if(t)t.click();
+};
 
 // ── SUBTABS DO VEÍCULO ───────────────────────────────────────────
 document.querySelectorAll('.subtab').forEach(function(t){
