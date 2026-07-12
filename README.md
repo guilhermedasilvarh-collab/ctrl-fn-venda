@@ -39,12 +39,11 @@ do zero, sem nenhum dado fictício.
 - Termos de Uso (`termos-de-uso.html`) e Política de Privacidade
   (`politica-de-privacidade.html`), com aceite obrigatório por checkbox no
   cadastro — sem marcar, `createUserWithEmailAndPassword` nem é chamado.
-  **Minuta inicial, não é aconselhamento jurídico** — tem campos marcados em
-  vermelho (`[PREENCHER]`) com a identidade do responsável (nome/CPF ou CNPJ),
-  cidade do foro e prazo de retenção de dados. Revise com um advogado antes do
-  primeiro usuário pagante — inclusive se vale a pena formalizar CNPJ/MEI, já
-  que pessoa física tratando dados comercialmente de terceiros sai da exceção
-  de "uso pessoal" da LGPD.
+  **Minuta inicial, não é aconselhamento jurídico** — já preenchida com
+  identidade do responsável, cidade do foro e prazo de retenção de dados, mas
+  revise com um advogado antes do primeiro usuário pagante — inclusive se
+  vale a pena formalizar CNPJ/MEI, já que pessoa física tratando dados
+  comercialmente de terceiros sai da exceção de "uso pessoal" da LGPD.
 - **Perfil personalizável** (onboarding + editável depois em Configurar →
   Perfil): tipo de regime (PJ / CLT / Autônomo), com labels dinâmicos em todo
   o app ("Custos PJ" vira "Custos do trabalho" fora do regime PJ); cronograma
@@ -113,8 +112,8 @@ expiradas) — ver o tratamento em `loadData()`.
   `"trial"` para `"pro"` → salve. Na próxima vez que o usuário abrir o app
   (ou recarregar a página), `aplicarPlano()` libera o acesso automaticamente,
   sem precisar de nenhum deploy.
-- **Pendente antes de vender de verdade**: preencher os dois `[PREENCHER]`
-  do `#modal-planos` em `index.html` — o preço mensal e a chave Pix.
+- Preço mensal (R$ 14,90) e chave Pix (e-mail) já preenchidos no
+  `#modal-planos` em `index.html`.
 - Fase 2 (futura, não iniciada): integração automática com Mercado Pago,
   provavelmente via Cloud Functions validando webhook no servidor (o cliente
   não pode simplesmente "avisar que pagou" sem validação server-side).
@@ -152,8 +151,8 @@ link para clientes reais.**
 
 - Cobrança automática (Fase 2): gateway Mercado Pago com validação de webhook
   server-side (Cloud Functions). Hoje a cobrança é manual — ver seção acima.
-- Preencher os campos `[PREENCHER]` dos termos/política/planos (identidade do
-  responsável, cidade do foro, prazo de retenção, preço mensal e chave Pix) e
-  revisar com advogado.
+- Termos, Política e planos já têm identidade do responsável, cidade do foro,
+  prazo de retenção, preço mensal e chave Pix preenchidos — falta revisar com
+  advogado antes do primeiro cliente pagante.
 - Categorias de despesa ainda são uma lista fixa (Moradia, Alimentação, etc.) —
   funcional para MVP, mas não editável pelo usuário.
