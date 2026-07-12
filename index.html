@@ -311,8 +311,13 @@ input,select,button{font-family:var(--fn);}
 /* CFG INPUT */
 .ci{background:var(--sur2);border:1px solid var(--bor);border-radius:8px;padding:8px 12px;color:var(--txt);font-size:13px;outline:none;width:100%;}
 .ci:focus{border-color:var(--blu);}
-/* BANNER INSTALAR APP — desativado */
-#install-banner{display:none !important;}
+/* BANNER INSTALAR APP */
+#install-banner{display:none;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;background:var(--grn2);border-bottom:1px solid var(--grn);font-size:12px;text-align:center;padding:8px 16px;line-height:1.5;}
+#install-banner span{color:var(--grn);}
+#install-banner button{background:var(--grn);color:#0f0f11;border:none;border-radius:99px;padding:5px 14px;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--fn);white-space:nowrap;}
+#install-banner button:hover{opacity:.9;}
+#install-banner button.ib-close{background:none;color:var(--grn);padding:2px 8px;font-size:15px;font-weight:400;opacity:.7;}
+#install-banner button.ib-close:hover{opacity:1;}
 @media(max-width:700px){
   .mets{grid-template-columns:repeat(2,1fr);}
   .grid2,.grid3{grid-template-columns:1fr;}

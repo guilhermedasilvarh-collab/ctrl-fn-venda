@@ -301,8 +301,6 @@ input,select,button{font-family:var(--fn);}
 /* CFG INPUT */
 .ci{background:var(--sur2);border:1px solid var(--bor);border-radius:8px;padding:8px 12px;color:var(--txt);font-size:13px;outline:none;width:100%;}
 .ci:focus{border-color:var(--blu);}
-/* BANNER INSTALAR APP — desativado */
-#install-banner{display:none !important;}
 @media(max-width:700px){
   .mets{grid-template-columns:repeat(2,1fr);}
   .grid2,.grid3{grid-template-columns:1fr;}
@@ -370,11 +368,6 @@ input,select,button{font-family:var(--fn);}
     </div>
   </div>
   <div class="demo-strip">🔍 Você está numa demonstração com dados fictícios — nada aqui é salvo em nuvem. Tudo volta ao normal se você recarregar a página ou clicar em "reiniciar demo".</div>
-  <div id="install-banner">
-    <span>📱 Para usar sem a barra do navegador, instale como app:</span>
-    <button onclick="doInstall()">Instalar app</button>
-    <button class="ib-close" onclick="document.getElementById('install-banner').style.display='none'">✕</button>
-  </div>
   <div class="main">
     <div class="tabs">
       <button class="tab on" data-sec="dashboard">Dashboard</button>
