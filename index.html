@@ -471,8 +471,7 @@ input,select,button{font-family:var(--fn);}
       </div>
       <div class="legbox">
         <span style="font-weight:500;color:var(--txt)">Quando pagar:</span>
-        <span id="leg-dia15"></span>
-        <span id="leg-dia2"></span>
+        <span id="leg-pagamentos"></span>
         <span><span class="td tdv">variável</span> sem data fixa</span>
       </div>
       <div class="grid3">
@@ -681,20 +680,13 @@ input,select,button{font-family:var(--fn);}
               <option value="autonomo">Autônomo</option>
             </select>
           </div>
-          <div><div style="font-size:11px;color:var(--mut);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em">Quantas vezes por mês recebe?</div>
-            <select id="pf-recebex" class="ci" onchange="pfToggleRecebeX()">
-              <option value="2">2 vezes</option>
-              <option value="1">1 vez</option>
-            </select>
-          </div>
         </div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:12px">
-          <div><div style="font-size:11px;color:var(--mut);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em">Dia do 1º pagamento</div><input type="number" id="pf-pag1dia" class="ci" min="1" max="31"></div>
-          <div><div style="font-size:11px;color:var(--mut);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em">Nome (opcional)</div><input type="text" id="pf-pag1label" class="ci" placeholder="Ex: Adiantamento"></div>
-        </div>
-        <div id="pf-pag2-wrap" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:12px">
-          <div><div style="font-size:11px;color:var(--mut);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em">Dia do 2º pagamento</div><input type="number" id="pf-pag2dia" class="ci" min="1" max="31"></div>
-          <div><div style="font-size:11px;color:var(--mut);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em">Nome (opcional)</div><input type="text" id="pf-pag2label" class="ci" placeholder="Ex: Saldo"></div>
+        <div style="font-size:11px;color:var(--mut);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em">Quando você recebe? (renda fixa em 1-2 datas ou variável em várias)</div>
+        <div class="hlist" id="pagamentos-cfg-list" style="margin-bottom:10px"></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr)) repeat(auto-fit,minmax(160px,1fr)) auto;gap:8px;margin-bottom:14px">
+          <input type="number" id="pagamento-novo-dia" class="ci" placeholder="Dia (ex: 15)" min="1" max="31">
+          <input type="text" id="pagamento-novo-label" class="ci" placeholder="Nome (opcional, ex: Cliente X)">
+          <button class="btn bg" onclick="addPagamentoCfg()">+ Adicionar recebimento</button>
         </div>
         <div class="fg" style="margin-bottom:12px">
           <label style="display:flex;align-items:center;gap:8px;cursor:pointer;text-transform:none;letter-spacing:0;font-size:13px;color:var(--txt)">
@@ -709,7 +701,6 @@ input,select,button{font-family:var(--fn);}
         <div class="ch"><div class="ct">Receita mensal</div></div>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:12px">
           <div><div style="font-size:11px;color:var(--mut);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em">Valor total da receita mensal (R$)</div><input type="number" id="cnota" placeholder="Ex: 9000" class="ci"></div>
-          <div id="cadiant-wrap"><div style="font-size:11px;color:var(--mut);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em" id="lbl-cadiant">Adiantamento (R$)</div><input type="number" id="cadiant" placeholder="Ex: 3000" class="ci"></div>
         </div>
         <button class="btn bg" onclick="saveConfig()">Salvar</button>
         <div style="font-size:12px;color:var(--mut);margin-top:10px" id="txt-cronograma"></div>
@@ -756,11 +747,7 @@ input,select,button{font-family:var(--fn);}
     <div class="fg"><label>Valor (R$)</label><input type="number" id="mc-valor" placeholder="0" class="ci"></div>
     <div class="fg">
       <label>Quando é pago</label>
-      <select id="mc-quando" class="ci">
-        <option value="dia15" id="opt-quando-dia15">Dia 15</option>
-        <option value="dia2" id="opt-quando-dia2">Dia 30</option>
-        <option value="outro">Variável / sem data fixa</option>
-      </select>
+      <select id="mc-quando" class="ci"></select>
     </div>
     <div class="fg">
       <label>Categoria</label>
@@ -874,19 +861,13 @@ input,select,button{font-family:var(--fn);}
         </select>
       </div>
       <div class="fg">
-        <label>Quantas vezes por mês você recebe?</label>
-        <select id="ob-recebex" class="ci" onchange="obToggleRecebeX()">
-          <option value="2">2 vezes (ex: adiantamento + saldo)</option>
-          <option value="1">1 vez</option>
-        </select>
+        <label>Quando você recebe? (renda fixa em 1-2 datas, ou variável em várias — adicione quantas precisar)</label>
       </div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px">
-        <div class="fg"><label>Dia do 1º pagamento</label><input type="number" id="ob-pag1dia" class="ci" placeholder="Ex: 15" min="1" max="31"></div>
-        <div class="fg"><label>Nome (opcional)</label><input type="text" id="ob-pag1label" class="ci" placeholder="Ex: Adiantamento"></div>
-      </div>
-      <div id="ob-pag2-wrap" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px">
-        <div class="fg"><label>Dia do 2º pagamento</label><input type="number" id="ob-pag2dia" class="ci" placeholder="Ex: 30" min="1" max="31"></div>
-        <div class="fg"><label>Nome (opcional)</label><input type="text" id="ob-pag2label" class="ci" placeholder="Ex: Saldo"></div>
+      <div class="hlist" id="ob-pagamentos-list" style="margin-bottom:10px"></div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr)) repeat(auto-fit,minmax(140px,1fr)) auto;gap:8px">
+        <input type="number" id="ob-pagamento-novo-dia" class="ci" placeholder="Dia (ex: 15)" min="1" max="31">
+        <input type="text" id="ob-pagamento-novo-label" class="ci" placeholder="Nome (opcional)">
+        <button class="btn bg" onclick="obAddPagamento()">+ Adicionar</button>
       </div>
       <div class="mact" style="justify-content:space-between">
         <button class="btn bx" onclick="skipOnboarding()">Pular por agora</button>
@@ -896,9 +877,8 @@ input,select,button{font-family:var(--fn);}
     <div id="ob-step-2" style="display:none">
       <div class="alogo" style="margin-bottom:6px">Configuração inicial · 2 de 5</div>
       <div class="mtitle">💰 Sua receita mensal</div>
-      <p style="font-size:13px;color:var(--mut);line-height:1.6;margin-bottom:18px">Informe o valor total. Se você recebe em duas datas, também dá pra registrar quanto cai em cada uma.</p>
+      <p style="font-size:13px;color:var(--mut);line-height:1.6;margin-bottom:18px">Informe o valor total que você espera receber no mês, somando todos os recebimentos.</p>
       <div class="fg"><label>Valor total da receita mensal (R$)</label><input type="number" id="ob-nota" class="ci" placeholder="Ex: 9000"></div>
-      <div class="fg" id="ob-adiant-wrap"><label id="ob-adiant-label">Valor do 1º pagamento (opcional, R$)</label><input type="number" id="ob-adiant" class="ci" placeholder="Ex: 3000"></div>
       <div class="mact" style="justify-content:space-between">
         <button class="btn bx" onclick="obBack(2)">← Voltar</button>
         <button class="btn bg" onclick="obNext(2)">Próximo →</button>
@@ -982,16 +962,17 @@ const DC={
   cartoes:[]
 };
 const DConfig={
-  nota:0,adiantamento:0,cartoes:[],
+  nota:0,cartoes:[],
   tema:'dark',
   tipoRegime:'pj', // 'pj' | 'clt' | 'autonomo'
-  recebeXVezes:2, // 1 ou 2
-  pag1Dia:15,pag1Label:'',
-  pag2Dia:30,pag2Label:'',
+  // lista flexível de recebimentos no mês — 1 (renda fixa), 2 (ex: adiantamento + saldo)
+  // ou quantos precisar (renda variável com vários pagamentos ao longo do mês)
+  pagamentos:[{id:'p1',dia:15,label:''},{id:'p2',dia:30,label:''}],
   temVeiculo:true,
   plano:'trial', // 'trial' | 'pro'
   trialInicio:null // definido na criação da conta (YYYY-MM-DD)
 };
+const MAX_PAGAMENTOS=8;
 const TRIAL_DIAS=14;
 const DRes={saldo:0,meta:0,aportes:[]};
 const DVeiculo={
@@ -1099,38 +1080,79 @@ function regimeLabels(){
   return{origemOpt:'💼 PJ (empresa)',custosTitle:'💼 Custos PJ',divisaoTitle:'🏢 Divisão PJ × Pessoal',origemTag:'💼 PJ',pjpfLbl:'💼 Conta PJ (empresa)',custosCat:'Custos PJ'};
 }
 
-// ── CRONOGRAMA DE RECEBIMENTO (1x ou 2x ao mês, dias configuráveis) ──
-function pagInfo(n){
+// ── CRONOGRAMA DE RECEBIMENTO (lista flexível — 1, 2 ou N pagamentos no mês) ──
+// paleta cíclica: cada recebimento cadastrado ganha uma cor, na ordem em que foi adicionado
+const CORES_PAG=[
+  {bg:'var(--blu2)',bd:'var(--blu)',fg:'var(--blu)'},
+  {bg:'var(--pur2)',bd:'var(--pur)',fg:'var(--pur)'},
+  {bg:'rgba(34,201,122,.15)',bd:'rgba(34,201,122,.5)',fg:'#22c97a'},
+  {bg:'rgba(245,166,35,.15)',bd:'rgba(245,166,35,.5)',fg:'#f5a623'},
+  {bg:'rgba(240,82,82,.15)',bd:'rgba(240,82,82,.5)',fg:'#f05252'},
+  {bg:'rgba(56,189,248,.15)',bd:'rgba(56,189,248,.5)',fg:'#38bdf8'}
+];
+function corPag(i){return CORES_PAG[i%CORES_PAG.length];}
+function pagamentos(){
   const cfg=S.config||DConfig;
-  const dia=cfg['pag'+n+'Dia']||(n===1?15:30);
-  const custom=(cfg['pag'+n+'Label']||'').trim();
-  return{dia:dia,short:custom||('dia '+dia),full:custom?(custom+' — dia '+dia):('Dia '+dia)};
+  return(Array.isArray(cfg.pagamentos)&&cfg.pagamentos.length)?cfg.pagamentos:[{id:'p1',dia:15,label:''}];
 }
-function recebeXVezes(){return(S.config&&S.config.recebeXVezes)||2;}
+function pagInfoById(id){
+  const p=pagamentos().find(function(x){return x.id===id;});
+  if(!p)return{id:id,dia:'-',short:'—',full:'—'};
+  const custom=(p.label||'').trim();
+  return{id:p.id,dia:p.dia,short:custom||('dia '+p.dia),full:custom?(custom+' — dia '+p.dia):('Dia '+p.dia)};
+}
+
+function fillMcQuandoOptions(){
+  const sel=document.getElementById('mc-quando');
+  if(!sel)return;
+  const cur=sel.value;
+  const pags=pagamentos();
+  sel.innerHTML=pags.map(function(p){return'<option value="'+p.id+'">'+pagInfoById(p.id).full+'</option>';}).join('')
+    +'<option value="outro">Variável / sem data fixa</option>';
+  const existe=pags.some(function(p){return p.id===cur;})||cur==='outro';
+  sel.value=existe?cur:(pags[0]?pags[0].id:'outro');
+}
 
 function aplicarCronograma(){
-  const dupla=recebeXVezes()===2;
-  const p1=pagInfo(1),p2=pagInfo(2);
-  const leg15=document.getElementById('leg-dia15');
-  if(leg15)leg15.innerHTML='<span class="td td15">'+p1.short+'</span> '+(dupla?'1º recebimento do mês':'recebimento do mês');
-  const leg2=document.getElementById('leg-dia2');
-  if(leg2){
-    leg2.style.display=dupla?'inline-flex':'none';
-    leg2.innerHTML=dupla?('<span class="td td2">'+p2.short+'</span> 2º recebimento do mês'):'';
+  fillMcQuandoOptions();
+  const pags=pagamentos();
+  const leg=document.getElementById('leg-pagamentos');
+  if(leg){
+    leg.innerHTML=pags.map(function(p,i){
+      const cor=corPag(i);
+      const lbl=pags.length>1?((i+1)+'º recebimento do mês'):'recebimento do mês';
+      return'<span style="margin-right:10px;display:inline-flex;align-items:center;gap:4px"><span class="td" style="background:'+cor.bg+';border:1px solid '+cor.bd+';color:'+cor.fg+'">'+pagInfoById(p.id).short+'</span> '+lbl+'</span>';
+    }).join('');
   }
-  const optD2=document.getElementById('opt-quando-dia2');
-  if(optD2)optD2.style.display=dupla?'':'none';
-  const optD1=document.getElementById('opt-quando-dia15');
-  if(optD1)optD1.textContent=p1.full;
-  if(optD2)optD2.textContent=p2.full;
-  const cadiantLbl=document.getElementById('lbl-cadiant');
-  if(cadiantLbl)cadiantLbl.textContent=p1.full+' (R$)';
-  const cadiantWrap=document.getElementById('cadiant-wrap');
-  if(cadiantWrap)cadiantWrap.style.display=dupla?'':'none';
   const txt=document.getElementById('txt-cronograma');
-  if(txt)txt.textContent=dupla
-    ?('Você recebe em duas datas: '+p1.full+' e '+p2.full+'.')
-    :('Você recebe em uma única data: '+p1.full+'.');
+  if(txt)txt.textContent=pags.length<=1
+    ?('Você recebe em uma única data: '+pagInfoById(pags[0].id).full+'.')
+    :('Você recebe em '+pags.length+' datas: '+pags.map(function(p){return pagInfoById(p.id).full;}).join(', ')+'.');
+}
+
+// migra contas antigas (recebeXVezes/pag1Dia/pag2Dia) pro formato de lista flexível de pagamentos,
+// e atualiza as tags 'quando' antigas ('dia15'/'dia2') nas contas já cadastradas
+function migrarPagamentos(){
+  if(!S.config)return;
+  if(!Array.isArray(S.config.pagamentos)||!S.config.pagamentos.length){
+    const dupla=(S.config.recebeXVezes||2)===2;
+    const arr=[{id:'p1',dia:S.config.pag1Dia||15,label:(S.config.pag1Label||'').trim()}];
+    if(dupla)arr.push({id:'p2',dia:S.config.pag2Dia||30,label:(S.config.pag2Label||'').trim()});
+    S.config.pagamentos=arr;
+  }
+  delete S.config.recebeXVezes;delete S.config.pag1Dia;delete S.config.pag1Label;
+  delete S.config.pag2Dia;delete S.config.pag2Label;delete S.config.adiantamento;
+  if(S.meses){
+    Object.keys(S.meses).forEach(function(k){
+      const mc=S.meses[k];
+      ['fixas','pj','variaveis','cartoes'].forEach(function(cat){
+        (mc[cat]||[]).forEach(function(c){
+          if(c.quando==='dia15')c.quando='p1';
+          else if(c.quando==='dia2')c.quando='p2';
+        });
+      });
+    });
+  }
 }
 
 function aplicarVisibilidadeVeiculo(){
@@ -1159,9 +1181,11 @@ function aplicarLabelsRegime(){
 }
 
 function tagDia(q){
-  if(q==='dia15')return'<span class="td td15">'+pagInfo(1).short+'</span>';
-  if(q==='dia2')return'<span class="td td2">'+pagInfo(2).short+'</span>';
-  return'<span class="td tdv">variável</span>';
+  if(!q||q==='outro')return'<span class="td tdv" data-quando="outro">variável</span>';
+  const idx=pagamentos().findIndex(function(p){return p.id===q;});
+  if(idx<0)return'<span class="td tdv" data-quando="outro">variável</span>';
+  const cor=corPag(idx);
+  return'<span class="td" data-quando="'+q+'" style="background:'+cor.bg+';border:1px solid '+cor.bd+';color:'+cor.fg+'">'+pagInfoById(q).short+'</span>';
 }
 
 // retorna as contas do mês atual (cria a partir do mês anterior se não existir)
@@ -1225,6 +1249,9 @@ async function loadData(){
       S=snap.data();
       if(!S.meses||typeof S.meses!=='object')S.meses={};
       if(!S.config)S.config=clone(DConfig);
+      // migra formato antigo (recebeXVezes/pag1Dia/pag2Dia) antes do preenchimento de
+      // defaults abaixo, senão o default de 'pagamentos' mascara os dados antigos
+      migrarPagamentos();
       // preenche com defaults qualquer campo de config que ainda não exista (contas antigas)
       Object.keys(DConfig).forEach(function(k){if(S.config[k]===undefined)S.config[k]=clone(DConfig)[k];});
       if(!Array.isArray(S.config.cartoes))S.config.cartoes=[];
@@ -1412,19 +1439,7 @@ function renderDashResPag(){
   if(!el)return;
   const c=getMesContas();
   const todas=[...(c.fixas||[]),...(c.pj||[]),...(c.variaveis||[]),...(c.cartoes||[])];
-  const t15=todas.filter(function(x){return x.quando==='dia15';});
-  const t2=todas.filter(function(x){return x.quando==='dia2';});
-  const sum15=t15.reduce(function(s,x){return s+Number(x.valor||0);},0);
-  const sum2=t2.reduce(function(s,x){return s+Number(x.valor||0);},0);
-  const pago15=t15.filter(function(x){return GST(x.id)==='pg';}).reduce(function(s,x){return s+Number(x.valor||0);},0);
-  const pago2=t2.filter(function(x){return GST(x.id)==='pg';}).reduce(function(s,x){return s+Number(x.valor||0);},0);
-  const pct15=sum15>0?Math.round(pago15/sum15*100):0;
-  const pct2=sum2>0?Math.round(pago2/sum2*100):0;
-  // breakdown PJ vs Pessoal por dia
-  const pj15=t15.filter(function(x){return x.origem==='pj';}).reduce(function(s,x){return s+Number(x.valor||0);},0);
-  const pf15=sum15-pj15;
-  const pj2=t2.filter(function(x){return x.origem==='pj';}).reduce(function(s,x){return s+Number(x.valor||0);},0);
-  const pf2=sum2-pj2;
+  const pags=pagamentos();
   function breakdownHtml(pj,pf){
     if(!pj&&!pf)return'';
     return'<div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;">'
@@ -1432,25 +1447,23 @@ function renderDashResPag(){
       +(pf?'<span style="font-size:11px;background:rgba(79,142,247,.12);border:1px solid rgba(79,142,247,.35);color:var(--blu);border-radius:99px;padding:2px 9px;font-weight:500">👤 Pessoal: '+R(pf)+'</span>':'')
     +'</div>';
   }
-  const dupla=recebeXVezes()===2;
-  const p1=pagInfo(1),p2=pagInfo(2);
-  el.classList.toggle('single-pag',!dupla);
-  el.innerHTML=
-    '<div class="rpc d15">'
-      +'<div class="rpc-lbl">📅 Pagar — '+p1.short+'</div>'
-      +'<div class="rpc-tot">'+R(sum15)+'</div>'
-      +'<div class="rpc-sub">'+R(pago15)+' pago · '+R(sum15-pago15)+' pendente · '+pct15+'%</div>'
-      +'<div class="rpc-bar"><div class="rpc-barfill" style="width:'+pct15+'%"></div></div>'
-      +breakdownHtml(pj15,pf15)
-    +'</div>'
-    +(dupla?(
-    '<div class="rpc d2">'
-      +'<div class="rpc-lbl">📅 Pagar — '+p2.short+'</div>'
-      +'<div class="rpc-tot">'+R(sum2)+'</div>'
-      +'<div class="rpc-sub">'+R(pago2)+' pago · '+R(sum2-pago2)+' pendente · '+pct2+'%</div>'
-      +'<div class="rpc-bar"><div class="rpc-barfill" style="width:'+pct2+'%"></div></div>'
-      +breakdownHtml(pj2,pf2)
-    +'</div>'):'');
+  el.classList.toggle('single-pag',pags.length<2);
+  el.innerHTML=pags.map(function(p,i){
+    const tx=todas.filter(function(x){return x.quando===p.id;});
+    const sum=tx.reduce(function(s,x){return s+Number(x.valor||0);},0);
+    const pago=tx.filter(function(x){return GST(x.id)==='pg';}).reduce(function(s,x){return s+Number(x.valor||0);},0);
+    const pct=sum>0?Math.round(pago/sum*100):0;
+    const pj=tx.filter(function(x){return x.origem==='pj';}).reduce(function(s,x){return s+Number(x.valor||0);},0);
+    const pf=sum-pj;
+    const cor=corPag(i);
+    return'<div class="rpc" style="background:'+cor.bg+';border:1px solid '+cor.bd+'">'
+      +'<div class="rpc-lbl" style="color:'+cor.fg+'">📅 Pagar — '+pagInfoById(p.id).short+'</div>'
+      +'<div class="rpc-tot" style="color:'+cor.fg+'">'+R(sum)+'</div>'
+      +'<div class="rpc-sub">'+R(pago)+' pago · '+R(sum-pago)+' pendente · '+pct+'%</div>'
+      +'<div class="rpc-bar"><div class="rpc-barfill" style="width:'+pct+'%;background:'+cor.fg+'"></div></div>'
+      +breakdownHtml(pj,pf)
+    +'</div>';
+  }).join('');
 }
 
 function renderAnual(){
@@ -1564,7 +1577,8 @@ function renderDash(){
   const saldo=cfg.nota-total;
   const saude=cfg.nota>0?saldo/cfg.nota:0;
 
-  const receitaSub=recebeXVezes()===2?(pagInfo(1).short+': '+R(cfg.adiantamento)):'Recebimento único';
+  const pags=pagamentos();
+  const receitaSub=pags.length>1?(pags.length+' recebimentos no mês'):'Recebimento único';
   document.getElementById('mets').innerHTML=
     met('b','Receita mensal',R(cfg.nota),receitaSub)+
     met('r','Total despesas',R(total),todos.length+' contas')+
@@ -1880,19 +1894,7 @@ function renderResPag(){
   if(!el)return;
   const c=getMesContas();
   const todas=[...(c.fixas||[]),...(c.pj||[]),...(c.variaveis||[]),...(c.cartoes||[])];
-  const t15=todas.filter(function(x){return x.quando==='dia15';});
-  const t2=todas.filter(function(x){return x.quando==='dia2';});
-  const sum15=t15.reduce(function(s,x){return s+Number(x.valor||0);},0);
-  const sum2=t2.reduce(function(s,x){return s+Number(x.valor||0);},0);
-  const pago15=t15.filter(function(x){return GST(x.id)==='pg';}).reduce(function(s,x){return s+Number(x.valor||0);},0);
-  const pago2=t2.filter(function(x){return GST(x.id)==='pg';}).reduce(function(s,x){return s+Number(x.valor||0);},0);
-  const pct15=sum15>0?Math.round(pago15/sum15*100):0;
-  const pct2=sum2>0?Math.round(pago2/sum2*100):0;
-  // breakdown PJ vs Pessoal por dia
-  const pj15=t15.filter(function(x){return x.origem==='pj';}).reduce(function(s,x){return s+Number(x.valor||0);},0);
-  const pf15=sum15-pj15;
-  const pj2=t2.filter(function(x){return x.origem==='pj';}).reduce(function(s,x){return s+Number(x.valor||0);},0);
-  const pf2=sum2-pj2;
+  const pags=pagamentos();
   function breakdownHtml(pj,pf){
     if(!pj&&!pf)return'';
     return'<div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">'
@@ -1900,28 +1902,24 @@ function renderResPag(){
       +(pf?'<span style="font-size:11px;background:rgba(79,142,247,.12);border:1px solid rgba(79,142,247,.35);color:var(--blu);border-radius:99px;padding:2px 9px;font-weight:500">👤 Pessoal: '+R(pf)+'</span>':'')
     +'</div>';
   }
-  const dupla=recebeXVezes()===2;
-  const p1=pagInfo(1),p2=pagInfo(2);
-  el.classList.toggle('single-pag',!dupla);
-  el.innerHTML=
-    '<div class="rpc d15" data-quando="dia15" onclick="filtrarPor(this,\'dia15\')">'
-      +'<div class="rpc-lbl">📅 '+p1.full+'</div>'
-      +'<div class="rpc-tot">'+R(sum15)+'</div>'
-      +'<div class="rpc-sub">'+R(pago15)+' pago · '+R(sum15-pago15)+' pendente · '+pct15+'%</div>'
-      +'<div class="rpc-bar"><div class="rpc-barfill" style="width:'+pct15+'%"></div></div>'
-      +breakdownHtml(pj15,pf15)
+  el.classList.toggle('single-pag',pags.length<2);
+  el.innerHTML=pags.map(function(p,i){
+    const tx=todas.filter(function(x){return x.quando===p.id;});
+    const sum=tx.reduce(function(s,x){return s+Number(x.valor||0);},0);
+    const pago=tx.filter(function(x){return GST(x.id)==='pg';}).reduce(function(s,x){return s+Number(x.valor||0);},0);
+    const pct=sum>0?Math.round(pago/sum*100):0;
+    const pj=tx.filter(function(x){return x.origem==='pj';}).reduce(function(s,x){return s+Number(x.valor||0);},0);
+    const pf=sum-pj;
+    const cor=corPag(i);
+    return'<div class="rpc" data-quando="'+p.id+'" style="background:'+cor.bg+';border:1px solid '+cor.bd+'" onclick="filtrarPor(this,\''+p.id+'\')">'
+      +'<div class="rpc-lbl" style="color:'+cor.fg+'">📅 '+pagInfoById(p.id).full+'</div>'
+      +'<div class="rpc-tot" style="color:'+cor.fg+'">'+R(sum)+'</div>'
+      +'<div class="rpc-sub">'+R(pago)+' pago · '+R(sum-pago)+' pendente · '+pct+'%</div>'
+      +'<div class="rpc-bar"><div class="rpc-barfill" style="width:'+pct+'%;background:'+cor.fg+'"></div></div>'
+      +breakdownHtml(pj,pf)
       +'<div class="rpc-hint">Clique para filtrar</div>'
-    +'</div>'
-    +(dupla?(
-    '<div class="rpc d2" data-quando="dia2" onclick="filtrarPor(this,\'dia2\')">'
-      +'<div class="rpc-lbl">📅 '+p2.full+'</div>'
-      +'<div class="rpc-tot">'+R(sum2)+'</div>'
-      +'<div class="rpc-sub">'+R(pago2)+' pago · '+R(sum2-pago2)+' pendente · '+pct2+'%</div>'
-      +'<div class="rpc-bar"><div class="rpc-barfill" style="width:'+pct2+'%"></div></div>'
-      +breakdownHtml(pj2,pf2)
-      +'<div class="rpc-hint">Clique para filtrar</div>'
-    +'</div>'):'');
-  return {sum15,sum2,pago15,pago2,pct15,pct2};
+    +'</div>';
+  }).join('');
 }
 
 let filtroAtivo=null;
@@ -1941,15 +1939,14 @@ window.filtrarPor=function(card,quando){
   document.querySelectorAll('.crow').forEach(function(row){
     const q=row.querySelector('.td');
     if(!q){row.classList.remove('filtrado-out');return;}
-    const ehDia=q.classList.contains(quando==='dia15'?'td15':'td2');
-    row.classList.toggle('filtrado-out',!ehDia);
+    row.classList.toggle('filtrado-out',q.dataset.quando!==quando);
   });
   // mostra badge
   const badge=document.getElementById('filtro-badge');
   const label=document.getElementById('filtro-label');
   if(badge&&label){
     badge.classList.add('vis');
-    label.textContent='Mostrando apenas contas do '+(quando==='dia15'?pagInfo(1).short:pagInfo(2).short);
+    label.textContent='Mostrando apenas contas do '+pagInfoById(quando).short;
   }
 };
 
@@ -2039,9 +2036,8 @@ function renderRes(){
 
 function renderCfg(){
   const cfg=S.config||DConfig;
-  const n=document.getElementById('cnota'),a=document.getElementById('cadiant');
+  const n=document.getElementById('cnota');
   if(n)n.value=cfg.nota||'';
-  if(a)a.value=cfg.adiantamento||'';
   renderCartoesCfg();
   fillCartaoSelect();
   fillPerfilForm();
@@ -2052,29 +2048,59 @@ function renderCfg(){
 function fillPerfilForm(){
   const cfg=S.config||DConfig;
   const r=document.getElementById('pf-regime');if(r)r.value=cfg.tipoRegime||'pj';
-  const x=document.getElementById('pf-recebex');if(x)x.value=String(cfg.recebeXVezes||2);
-  const d1=document.getElementById('pf-pag1dia');if(d1)d1.value=cfg.pag1Dia||15;
-  const l1=document.getElementById('pf-pag1label');if(l1)l1.value=cfg.pag1Label||'';
-  const d2=document.getElementById('pf-pag2dia');if(d2)d2.value=cfg.pag2Dia||30;
-  const l2=document.getElementById('pf-pag2label');if(l2)l2.value=cfg.pag2Label||'';
   const v=document.getElementById('pf-temveiculo');if(v)v.checked=cfg.temVeiculo!==false;
-  pfToggleRecebeX();
+  renderPagamentosCfg();
 }
 
-window.pfToggleRecebeX=function(){
-  const sel=document.getElementById('pf-recebex');
-  const wrap=document.getElementById('pf-pag2-wrap');
-  if(sel&&wrap)wrap.style.display=sel.value==='2'?'grid':'none';
+function renderPagamentosCfg(){
+  const el=document.getElementById('pagamentos-cfg-list');
+  if(!el)return;
+  const pags=pagamentos();
+  el.innerHTML=pags.map(function(p,i){
+    const cor=corPag(i);
+    return'<div class="hrow"><span><span class="td" style="background:'+cor.bg+';border:1px solid '+cor.bd+';color:'+cor.fg+'">'+pagInfoById(p.id).short+'</span></span>'
+      +'<button class="btn br" style="padding:4px 10px;font-size:11px" onclick="removePagamentoCfg(\''+p.id+'\')">Remover</button></div>';
+  }).join('');
+}
+
+window.addPagamentoCfg=async function(){
+  const diaInp=document.getElementById('pagamento-novo-dia');
+  const labelInp=document.getElementById('pagamento-novo-label');
+  const dia=parseInt(diaInp.value);
+  if(!dia||dia<1||dia>31){alert('Informe um dia válido, de 1 a 31.');return;}
+  if(!S.config)S.config=clone(DConfig);
+  if(!Array.isArray(S.config.pagamentos))S.config.pagamentos=[];
+  if(S.config.pagamentos.length>=MAX_PAGAMENTOS){alert('Máximo de '+MAX_PAGAMENTOS+' recebimentos por mês.');return;}
+  S.config.pagamentos.push({id:'p'+Date.now(),dia:dia,label:labelInp.value.trim()});
+  diaInp.value='';labelInp.value='';
+  renderPagamentosCfg();
+  aplicarCronograma();
+  renderAll();
+  await persist();
+};
+
+window.removePagamentoCfg=async function(id){
+  if(S.config.pagamentos.length<=1){alert('Você precisa manter pelo menos um recebimento cadastrado.');return;}
+  if(!confirm('Remover este recebimento? Despesas já marcadas com ele passam a ficar como "Variável".'))return;
+  S.config.pagamentos=S.config.pagamentos.filter(function(p){return p.id!==id;});
+  // contas que apontavam pro recebimento removido viram "variável"
+  if(S.meses){
+    Object.keys(S.meses).forEach(function(k){
+      const mc=S.meses[k];
+      ['fixas','pj','variaveis','cartoes'].forEach(function(cat){
+        (mc[cat]||[]).forEach(function(c){if(c.quando===id)c.quando='outro';});
+      });
+    });
+  }
+  renderPagamentosCfg();
+  aplicarCronograma();
+  renderAll();
+  await persist();
 };
 
 window.savePerfil=async function(){
   if(!S.config)S.config=clone(DConfig);
   S.config.tipoRegime=document.getElementById('pf-regime').value;
-  S.config.recebeXVezes=parseInt(document.getElementById('pf-recebex').value)||2;
-  S.config.pag1Dia=parseInt(document.getElementById('pf-pag1dia').value)||15;
-  S.config.pag1Label=document.getElementById('pf-pag1label').value.trim();
-  S.config.pag2Dia=parseInt(document.getElementById('pf-pag2dia').value)||30;
-  S.config.pag2Label=document.getElementById('pf-pag2label').value.trim();
   S.config.temVeiculo=document.getElementById('pf-temveiculo').checked;
   renderAll();
   const st=document.getElementById('pfStatus');
@@ -2147,22 +2173,41 @@ function renderCartoesOb(){
     :'<div style="font-size:12px;color:var(--mut)">Nenhum cartão ainda — tudo bem, você pode adicionar depois.</div>';
 }
 
-window.obToggleRecebeX=function(){
-  const dupla=document.getElementById('ob-recebex').value==='2';
-  document.getElementById('ob-pag2-wrap').style.display=dupla?'grid':'none';
+function renderPagamentosOb(){
+  const el=document.getElementById('ob-pagamentos-list');
+  if(!el)return;
+  const pags=pagamentos();
+  el.innerHTML=pags.length?pags.map(function(p,i){
+    const cor=corPag(i);
+    return'<div class="hrow"><span><span class="td" style="background:'+cor.bg+';border:1px solid '+cor.bd+';color:'+cor.fg+'">'+pagInfoById(p.id).short+'</span></span>'
+      +'<button class="btn br" style="padding:4px 10px;font-size:11px" onclick="obRemovePagamento(\''+p.id+'\')">Remover</button></div>';
+  }).join(''):'<div style="font-size:12px;color:var(--mut)">Nenhum recebimento cadastrado ainda.</div>';
+}
+
+window.obAddPagamento=function(){
+  const diaInp=document.getElementById('ob-pagamento-novo-dia');
+  const labelInp=document.getElementById('ob-pagamento-novo-label');
+  const dia=parseInt(diaInp.value);
+  if(!dia||dia<1||dia>31){alert('Informe um dia válido, de 1 a 31.');return;}
+  if(!S.config)S.config=clone(DConfig);
+  if(!Array.isArray(S.config.pagamentos))S.config.pagamentos=[];
+  if(S.config.pagamentos.length>=MAX_PAGAMENTOS){alert('Máximo de '+MAX_PAGAMENTOS+' recebimentos por mês.');return;}
+  S.config.pagamentos.push({id:'p'+Date.now(),dia:dia,label:labelInp.value.trim()});
+  diaInp.value='';labelInp.value='';
+  renderPagamentosOb();
+};
+
+window.obRemovePagamento=function(id){
+  if(S.config.pagamentos.length<=1){alert('Você precisa manter pelo menos um recebimento cadastrado.');return;}
+  S.config.pagamentos=S.config.pagamentos.filter(function(p){return p.id!==id;});
+  renderPagamentosOb();
 };
 
 function showOnboarding(){
   const cfg=S.config||DConfig;
   document.getElementById('ob-regime').value=cfg.tipoRegime||'pj';
-  document.getElementById('ob-recebex').value=String(cfg.recebeXVezes||2);
-  document.getElementById('ob-pag1dia').value=cfg.pag1Dia||15;
-  document.getElementById('ob-pag1label').value=cfg.pag1Label||'';
-  document.getElementById('ob-pag2dia').value=cfg.pag2Dia||30;
-  document.getElementById('ob-pag2label').value=cfg.pag2Label||'';
-  obToggleRecebeX();
+  renderPagamentosOb();
   document.getElementById('ob-nota').value=cfg.nota||'';
-  document.getElementById('ob-adiant').value=cfg.adiantamento||'';
   document.getElementById('ob-temveiculo').checked=cfg.temVeiculo!==false;
   document.getElementById('ob-meta').value=(S.reserva&&S.reserva.meta)||'';
   renderCartoesOb();
@@ -2174,18 +2219,9 @@ window.obNext=function(cur){
   if(!S.config)S.config=clone(DConfig);
   if(cur===1){
     S.config.tipoRegime=document.getElementById('ob-regime').value;
-    S.config.recebeXVezes=parseInt(document.getElementById('ob-recebex').value)||2;
-    S.config.pag1Dia=parseInt(document.getElementById('ob-pag1dia').value)||15;
-    S.config.pag1Label=document.getElementById('ob-pag1label').value.trim();
-    S.config.pag2Dia=parseInt(document.getElementById('ob-pag2dia').value)||30;
-    S.config.pag2Label=document.getElementById('ob-pag2label').value.trim();
-    const dupla=S.config.recebeXVezes===2;
-    document.getElementById('ob-adiant-wrap').style.display=dupla?'block':'none';
-    document.getElementById('ob-adiant-label').textContent=dupla?(pagInfo(1).full+' (opcional, R$)'):'Valor do 1º pagamento (opcional, R$)';
   }
   if(cur===2){
     S.config.nota=parseFloat(document.getElementById('ob-nota').value)||0;
-    S.config.adiantamento=parseFloat(document.getElementById('ob-adiant').value)||0;
   }
   if(cur===3){
     S.config.temVeiculo=document.getElementById('ob-temveiculo').checked;
@@ -2650,7 +2686,9 @@ document.addEventListener('click',function(e){
     document.getElementById('mc-save').textContent='Salvar';
     document.getElementById('mc-nome').value='';
     document.getElementById('mc-valor').value='';
-    document.getElementById('mc-quando').value='dia15';
+    fillMcQuandoOptions();
+    const primeiroPag=pagamentos()[0];
+    document.getElementById('mc-quando').value=primeiroPag?primeiroPag.id:'outro';
     document.getElementById('mc-categoria').value='';
     document.getElementById('mc-cartao').value='';
     document.getElementById('mc-venc').value='';
@@ -2679,6 +2717,7 @@ document.addEventListener('click',function(e){
     document.getElementById('mc-save').textContent='Salvar alterações';
     document.getElementById('mc-nome').value=conta.nome||'';
     document.getElementById('mc-valor').value=conta.valor||0;
+    fillMcQuandoOptions();
     document.getElementById('mc-quando').value=conta.quando||'outro';
     document.getElementById('mc-categoria').value=conta.categoria||'';
     document.getElementById('mc-cartao').value=conta.cartao||'';
@@ -2880,7 +2919,6 @@ window.saveMeta=async function(){
 window.saveConfig=async function(){
   if(!S.config)S.config=clone(DConfig);
   S.config.nota=parseFloat(document.getElementById('cnota').value)||0;
-  S.config.adiantamento=parseFloat(document.getElementById('cadiant').value)||0;
   if(!Array.isArray(S.config.cartoes))S.config.cartoes=[];
   renderAll();
   await persist();

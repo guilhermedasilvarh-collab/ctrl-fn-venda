@@ -47,10 +47,14 @@ do zero, sem nenhum dado fictício.
 - **Perfil personalizável** (onboarding + editável depois em Configurar →
   Perfil): tipo de regime (PJ / CLT / Autônomo), com labels dinâmicos em todo
   o app ("Custos PJ" vira "Custos do trabalho" fora do regime PJ); cronograma
-  de recebimento configurável — 1 ou 2 pagamentos por mês, com dia e rótulo
-  livres (não é mais fixo em "dia 15 / dia 2", pode ser qualquer combinação,
-  ex: dia 5 e dia 20); e toggle "tenho veículo", que mostra/esconde a aba
-  Veículo inteira.
+  de recebimento configurável como **lista flexível** (`S.config.pagamentos`,
+  array de `{id,dia,label}`) — cobre desde renda fixa em 1-2 datas até renda
+  variável com vários recebimentos ao longo do mês (ex: freelancer com
+  pagamentos de clientes em dias diferentes), cada um com dia e nome livres,
+  adicionados/removidos em Configurar → Perfil ou no onboarding. Cada conta
+  cadastrada é marcada com o recebimento a que pertence (`quando`, referência
+  ao `id` do pagamento, ou `'outro'` para variável/sem data fixa); e toggle
+  "tenho veículo", que mostra/esconde a aba Veículo inteira.
 - **Tema claro/escuro**: botão no topbar (🌙/☀️), persiste por usuário
   (`S.config.tema`) e também no `localStorage` do navegador para não piscar o
   tema errado no primeiro carregamento. Gráficos (Chart.js) leem as cores via
